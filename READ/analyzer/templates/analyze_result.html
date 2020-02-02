@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+{% block header %}
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+{% endblock %}
+{% block contents %}
+<!-- Navbar Menu  ---->
+<section id="nav-bar">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/.">
+        <img src="{% static 'images/READ.png'%}" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fa fa-bars"></i>
+        </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/video">Video</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/subscribe">Subscribe</a>
+        </li> 
+        </ul>
+    </div>
+    </nav>
+</section>
+
+<br><br><br>
+<script>
+var reaction = '{{ reaction }}';
+var obj = JSON.parse(reaction.replace(/&quot;/g,'"'));
+
+var duration = obj.duration;
+var time = obj.time;
+var graph_data = new Array();
+
+for(var i = 0; i < time.length; i++){
+  switch(time[i]){
+    case 0: // Concentrate
+      graph_data[i] = {
+        type: "stackedBar",
+        color: "#4157fa",
+        toolTipContent: "{label}<b>{name}:</b> {y}",
+        name: "Concen O",
+        dataPoints: [{ y: 10 }]
+      };
+      break;
+    case 1: // Don't concentrate
+      graph_data[i] = {
+        type: "stackedBar",
+        color: "#F15628",
+        toolTipContent: "{label}<b>{name}:</b> {y}",
+        name: "Concen X",
+        dataPoints: [{ y: 10 }]
+      }
+      break;
+    case 2: // Error
+      graph_data[i] = {
+        type: "stackedBar",
+        color: "#F15628",
+        toolTipContent: "{label}<b>{name}:</b> {y}",
+        name: "Concen X",
+        dataPoints: [{ y: 10 }]
+      }
+      break;
+    case 3: // Default value (Playing X)
+      graph_data[i] = {
+        type: "stackedBar",
+        color: "#4f4f4f",
+        toolTipContent: "{label}<b>{name}:</b> {y}",
+        name: "Playing X",
+        dataPoints: [{ y: 10 }]
+      }
+      break;
+  }
+}
+
+window.onload = function () {
+  var barchart = new CanvasJS.Chart("barchartContainer", {
+    animationEnabled: true,
+    theme: "light2", //"light1", "dark1", "dark2"
+    axisY:{
+      interval: 40,
+      suffix: "s",
+      maximum: duration*10
+    },
+    toolTip:{
+      shared: true
+    },
+    data: graph_data
+  });
+barchart.render();
+
+
+var counts = {};
+var sum_counts = duration;
+counts[0] = 0; counts[1] = 0; counts[2] = 0; counts[3] = 0;
+for (var i = 0; i < time.length; i++) {
+		counts[time[i]] += 1;
+}
+
+for (var i = 0; i <= 3; i++) {
+		counts[i] = counts[i] / sum_counts * 100;
+}
+
+var piechart = new CanvasJS.Chart("piechartContainer", {
+  animationEnabled: true,
+  data: [{
+    type: "pie",
+    startAngle: 240,
+    yValueFormatString: "##0.00\"%\"",
+    indexLabel: "{label} {y}",
+    dataPoints: [
+      {y: counts[0], label: "Concen O", color: "#4157fa"},
+      {y: counts[1] + counts[2], label: "Concen X", color: "#F15628"},
+      {y: counts[3], label: "Playing X", color: "#4f4f4f"}
+    ]
+  }]
+});
+piechart.render();
+}
+
+function toggleDataSeries(e) {
+  if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+    e.dataSeries.visible = false;
+  }
+  else {
+    e.dataSeries.visible = true;
+  }
+  chart.render();
+}
+</script>
+</head>
+
+<body>
+<h3 class="title text-center">RESULT</h3>
+<br>
+<br>
+
+<div id="main" style="margin-top:10px;">
+	<div class="container">
+        <div class="jumbotron">
+            <h4 class="text-center"><span class="badge badge-primary">User</span> : <span class="badge badge-dark">{{ user_name }}</span></h3>
+            <h4 class="text-center"><span class="badge badge-primary">Video</span> : <span class="badge badge-dark">{{ video_name }}</span></h3>
+        </div>
+        <br><br>.
+        <h4 class="title text-center"><b>Concentration by time</b></h4>
+        <div id="barchartContainer" style="height: 370px; width: 100%;"></div>
+        <br><br><br><br><br>
+        <h4 class="title text-center"><b>Ratio</b></h4>
+        <div id="piechartContainer" style="height: 350px; width: 100%; border:2px;"></div>
+        <br><br><br><br>
+	</div>
+</div>
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+
+{% endblock %}
