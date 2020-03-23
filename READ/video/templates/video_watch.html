@@ -2,7 +2,14 @@
 {% load humanize %}
 {% load static %}
 
+
+
+
 {% block header %}
+
+<script type="module" src="{% static 'index.js' %}"></script>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/7.3.0/adapter.min.js"></script>
 <script type="text/javascript">
     function gotStream(stream) {
@@ -15,11 +22,16 @@
     function onfail(error) {
         console.log("permission not granted or system don't have media devices."+error.name);
     }
+    
     navigator.getUserMedia({audio:true,video:true}, gotStream,onfail);
 </script>
 {% endblock %}
 
 {% block contents %}
+
+
+
+
 <!-- Navbar Menu  -->
 <section id="nav-bar">
     <nav class="navbar navbar-expand-lg navbar-light">
@@ -115,6 +127,88 @@
     <br><br><br>
 </section>
 
+
+
+
+
+
+
+<!-- 신규생성코드 - 리워드지급 -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">       
+      <h1 class="text-center">강의수강 완료</h1>
+      <h3 class="text-center">
+        <code>데이터 제공 리워드지급</code>  
+        <button type="button" 
+                class="btn btn-info pull-right" 
+                id="login" 
+                data-toggle="modal"
+                data-target="#loginModal">
+                지갑연동
+        </button>
+        <button type="button" 
+                class="btn btn-info pull-right" 
+                id="logout" 
+                style="display: none;"
+                onclick="App.handleLogout()">
+                로그아웃
+        </button>
+      </h3>         
+      <div class="text-center" id="address"></div>   
+      <div class="text-center" id="contractBalance"></div> 
+      <hr /> 
+    </div>
+  </div>
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="loginModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">         
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="keystore">Keystore</label>
+            <input type="file" id="keystore" onchange="App.handleImport()">
+          </div>
+          <div class="form-group">
+            <label for="input-password">비밀번호</label>
+            <input type="password" class="form-control" id="input-password" onchange="App.handlePassword()">
+            <p class="help-block" id="message"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+          <button type="button" class="btn btn-primary" id="submit" onclick="App.handleLogin()">제출</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 <script> 
@@ -186,6 +280,10 @@ function captureWebcam(){
     "mimeType": "multipart/form-data",
     "data": form,
     success: function(){
+
+      //change UI 리워드 지급
+
+      //result 페이지로 이동
       $('.result').html();
     },
     complete: function(){
