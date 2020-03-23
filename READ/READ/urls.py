@@ -15,8 +15,6 @@ Including another URLconf
 """
 
 # TODO: Subdivided into several url files of each app.
-from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from user.views import RegisterView, LoginView, index, logout, login_API, register_API
@@ -47,4 +45,4 @@ urlpatterns = [
     path('dashboard/', DashboardView.as_view()),
     path('dashboard/video/<int:pk>/', DashboardVideoView.as_view()),
     path('dashboard/user/<int:pk>/', DashboardUserView.as_view()),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
