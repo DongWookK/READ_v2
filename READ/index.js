@@ -17,6 +17,7 @@ const App = {
 
   start: async function () {
     console.log("start");
+    console.log(walletFromSession);
     const walletFromSession = sessionStorage.getItem('walletInstance');
     if (walletFromSession) {
       try {
@@ -91,15 +92,15 @@ const App = {
     var answer = $('#answer').val();  
 
     if (answer === result) {
-      if (confirm("대단하네요^^ 0.1 KLAY 받기")) {
+      if (confirm("Event pass")) {
         if (await this.callContractBalance() >= 0.1) {         
           this.receiveKlay();
         } else {
-          alert("죄송합니다. 컨트랙의 KLAY가 다 소모되었습니다.");
+          alert("contract Balance not enough");
         }       
       }
     } else {
-      alert("땡! 초등학생도 하는데 ㅠㅠ");
+      alert("contract error occur, event not passed");
     }
   },
 
@@ -161,6 +162,7 @@ const App = {
     const walletInstance = cav.klay.accounts.privateKeyToAccount(privateKey);
     cav.klay.accounts.wallet.add(walletInstance)
     sessionStorage.setItem('walletInstance', JSON.stringify(walletInstance));
+    console.log(walletInstance);
     this.changeUI(walletInstance);  
   },
 
@@ -172,11 +174,13 @@ const App = {
   },
 
   changeUI: async function (walletInstance) {
-    console.log("changUI");
+    console.log("changUI",walletInstance);
     $('#loginModal').modal('hide');
     $("#login").hide(); 
     $('#logout').show();
-    $('#address').append('<br>' + '<p>' + '내 계정 주소: ' + walletInstance.address + '</p>');
+    //여기 코드 고쳐야됨
+    var K_balance = cav.utils.fromPeb(cav.klay.getBalance(walletInstance.address));
+    $('#address').append('<br>' + '<p>' + '내 잔액 : ' + K_balance.toString() + '</p>');
 
 
     if (await this.callOwner() === walletInstance.address) {
@@ -190,20 +194,6 @@ const App = {
     this.reset();
   },
 
-  showTimer: function () {
-    var seconds = 3;
-    $('#timer').text(seconds);
-    var interval = setInterval(function() {  
-      $('#timer').text(--seconds);  
-      if (seconds <= 0) {
-        $('#timer').text('');
-        $('#answer').val('');
-        $('#question').hide();
-        $('#start').show();          
-        clearInterval(interval);
-      }     
-    }, 1000);
-  },
 
 
   receiveKlay: function() {
